@@ -1,0 +1,17 @@
+{
+  "name": "stock-dashboard-api",
+  "version": "1.0.0",
+  "description": "Used to expose data from the yahoo finance API.",
+  "main": "index.js",
+  "scripts": {
+    "d": "node index.js"
+  },
+  "keywords": [],
+  "author": "Malcolm",
+  "license": "ISC",
+  "dependencies": {
+    "cors": "^2.8.5",
+    "express": "^4.17.1",
+    "yahoo-finance": "^0.3.7"
+  }
+}

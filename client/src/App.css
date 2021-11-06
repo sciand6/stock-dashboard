@@ -9,6 +9,11 @@
   font-size: x-large;
 }
 
+.page-number:hover {
+  color: rgb(78, 78, 255);
+  cursor: pointer;
+}
+
 .App {
   text-align: center;
 }

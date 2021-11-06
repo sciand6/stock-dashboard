@@ -1,9 +1,8 @@
 import React, { useState } from "react";
-import { compare } from "./utils/StockDataProcessessing";
+import { compare, setChartData } from "./utils/StockDataProcessessing";
 import "./App.css";
 import Stock from "./components/Stock";
 import ReactHighcharts from "react-highcharts/ReactHighstock.src";
-import moment from "moment";
 
 function App() {
   const options = { style: "currency", currency: "USD" };
@@ -12,6 +11,8 @@ function App() {
   const [lowdate, setlowdate] = useState("");
   const [highdate, sethighdate] = useState("");
   const [tickersinput, settickersinput] = useState("");
+  const [pagearr, setpagearr] = useState([]);
+  const [loading, setloading] = useState(false);
 
   function getChartData(property) {
     let chartData = [];
@@ -25,112 +26,38 @@ function App() {
     return chartData;
   }
 
-  function setChartData(ticker, chartData) {
-    return {
-      yAxis: [
-        {
-          offset: 20,
-
-          labels: {
-            formatter: function () {
-              return numberFormat.format(this.value);
-            },
-            x: -15,
-            style: {
-              color: "#000",
-              position: "absolute",
-            },
-            align: "left",
-          },
-        },
-      ],
-      tooltip: {
-        shared: true,
-        formatter: function () {
-          return (
-            numberFormat.format(this.y, 0) +
-            "</b><br/>" +
-            moment(this.x).format("MMMM Do YYYY, h:mm")
-          );
-        },
-      },
-      plotOptions: {
-        series: {
-          showInNavigator: true,
-          gapSize: 6,
-        },
-      },
-      rangeSelector: {
-        selected: 1,
-      },
-      title: {
-        text: `${ticker} stock price`,
-      },
-      chart: {
-        height: 500,
-      },
-
-      credits: {
-        enabled: false,
-      },
-
-      legend: {
-        enabled: true,
-      },
-      xAxis: {
-        type: "date",
-      },
-      rangeSelector: {
-        buttons: [
-          {
-            type: "day",
-            count: 1,
-            text: "1d",
-          },
-          {
-            type: "day",
-            count: 7,
-            text: "7d",
-          },
-          {
-            type: "month",
-            count: 1,
-            text: "1m",
-          },
-          {
-            type: "month",
-            count: 3,
-            text: "3m",
-          },
-          {
-            type: "all",
-            text: "All",
-          },
-        ],
-        selected: 4,
-      },
-      series: [
-        {
-          name: "Price",
-          type: "spline",
-
-          data: chartData,
-          tooltip: {
-            valueDecimals: 2,
-          },
-        },
-      ],
-    };
+  function buildInput() {
+    if (!lowdate || !highdate || !tickersinput) return;
+    var result = [];
+    const tickerArr = tickersinput.split(",");
+    var j = 0;
+    var temp = [];
+    for (let i = 0; i < tickerArr.length; i++) {
+      temp.push(tickerArr[i]);
+      if (j === 10) {
+        result.push(temp);
+        j = 0;
+        temp = [];
+      }
+      j++;
+    }
+    setpagearr(result);
   }
 
-  function getStocks() {
-    settickersinput(tickersinput.replaceAll(" ", ""));
-    if (!lowdate || !highdate || !tickersinput) return;
+  function getStocks(index) {
+    if (pagearr.length === 0 || !pagearr) return;
+    setloading(true);
+    const tickerArr = pagearr[index];
+    var inputString = "";
+    var arr = [];
+    for (let i = 0; i < tickerArr.length; i++) {
+      inputString += tickerArr[i] + ",";
+    }
     const opts = {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        tickers: tickersinput,
+        tickers: inputString.slice(0, -1),
         lowdate,
         highdate,
       }),
@@ -138,7 +65,6 @@ function App() {
     fetch("http://localhost:5000/", opts)
       .then((data) => data.json())
       .then((res) => {
-        let arr = [];
         try {
           for (const property in res) {
             let chartData = getChartData(res[property]);
@@ -161,17 +87,22 @@ function App() {
                 (res[property][0].adjClose -
                   res[property][res[property].length - 1].adjClose) /
                 res[property][res[property].length - 1].adjClose,
-              configPrice: setChartData(property, chartData),
+              configPrice: setChartData(property, chartData, numberFormat),
             };
             arr.push(obj);
           }
         } catch (error) {
           // swallow error
-          console.log(error);
+          console.log(error + "\nYour input:\n" + inputString);
         }
-        setstockdata(arr.sort(compare));
+        // console.log(arr);
+        setTimeout(() => {
+          setstockdata(arr.sort(compare));
+          setloading(false);
+        }, 3000);
       });
   }
+
   return (
     <div className="App">
       <h1>Stock Dashboard</h1>
@@ -181,22 +112,37 @@ function App() {
       <br />
       <br />
       <input type="text" onChange={(e) => settickersinput(e.target.value)} />
-      <button onClick={() => getStocks()}>SUBMIT</button>
-      <div className="headers">
-        <div>Ticker</div>
-        <div>ROI</div>
-        <div>Close</div>
-        <div>High</div>
-        <div>Low</div>
-      </div>
-      {stockdata.map((stock) => {
-        return (
-          <div>
-            <Stock stock={stock} />
-            <ReactHighcharts config={stock.configPrice}></ReactHighcharts>
+      <button onClick={() => buildInput()}>Submit</button>
+      <br />
+      <br />
+      {loading ? (
+        "Loading Results..."
+      ) : (
+        <div>
+          {pagearr.map((inp, index) => {
+            return (
+              <span className="page-number" onClick={() => getStocks(index)}>
+                {index + 1} &nbsp;
+              </span>
+            );
+          })}
+          <div className="headers">
+            <div>Ticker</div>
+            <div>ROI</div>
+            <div>Close</div>
+            <div>High</div>
+            <div>Low</div>
           </div>
-        );
-      })}
+          {stockdata.map((stock) => {
+            return (
+              <div>
+                <Stock stock={stock} />
+                <ReactHighcharts config={stock.configPrice}></ReactHighcharts>
+              </div>
+            );
+          })}
+        </div>
+      )}
     </div>
   );
 }

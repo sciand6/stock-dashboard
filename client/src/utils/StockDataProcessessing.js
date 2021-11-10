@@ -1,11 +1,5 @@
 import moment from "moment";
 
-function compare(a, b) {
-  if (a.roi > b.roi) return -1;
-  if (a.roi < b.roi) return 1;
-  return 0;
-}
-
 function setChartData(ticker, chartData, numberFormat) {
   return {
     yAxis: [
@@ -101,4 +95,74 @@ function setChartData(ticker, chartData, numberFormat) {
   };
 }
 
-export { compare, setChartData };
+function getChartData(property) {
+  let chartData = [];
+  for (var i = property.length - 1; i >= 0; i--) {
+    let chartItem = [
+      new Date(property[i].date).getTime(),
+      property[i].adjClose,
+    ];
+    chartData.push(chartItem);
+  }
+  return chartData;
+}
+
+function tickersToPages(tickersArr) {
+  var j = 0;
+  var temp = [];
+  var result = [];
+
+  for (let i = 0; i < tickersArr.length; i++) {
+    temp.push(tickersArr[i]);
+    if (j === 10) {
+      result.push(temp);
+      j = 0;
+      temp = [];
+    }
+    j++;
+  }
+
+  if (temp.length > 0) result.push(temp);
+
+  return result;
+}
+
+function processStockData(res) {
+  const options = { style: "currency", currency: "USD" };
+  const numberFormat = new Intl.NumberFormat("en-US", options);
+  var arr = [];
+  var failed = [];
+  for (const property in res) {
+    try {
+      let chartData = getChartData(res[property]);
+      let obj = {
+        ticker: property,
+        close: res[property][0].adjClose,
+        high: Math.max.apply(
+          Math,
+          res[property].map(function (o) {
+            return o.high;
+          })
+        ),
+        low: Math.min.apply(
+          Math,
+          res[property].map(function (o) {
+            return o.low;
+          })
+        ),
+        roi:
+          (res[property][0].adjClose -
+            res[property][res[property].length - 1].adjClose) /
+          res[property][res[property].length - 1].adjClose,
+        configPrice: setChartData(property, chartData, numberFormat),
+      };
+      arr.push(obj);
+    } catch {
+      failed.push(property);
+    }
+  }
+
+  return { failed, arr };
+}
+
+export { setChartData, getChartData, tickersToPages, processStockData };

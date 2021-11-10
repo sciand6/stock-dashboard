@@ -1,55 +1,53 @@
 import React, { useState } from "react";
-import { compare, setChartData } from "./utils/StockDataProcessessing";
+import {
+  processStockData,
+  tickersToPages,
+} from "./utils/StockDataProcessessing";
+import { checkDates, checkTickers } from "./utils/InputValidation";
+import { requestError, compare } from "./utils/General";
 import "./App.css";
-import Stock from "./components/Stock";
-import ReactHighcharts from "react-highcharts/ReactHighstock.src";
+import TickerInput from "./components/TickerInput";
+import PageList from "./components/PageList";
+import StockList from "./components/StockList";
 
 function App() {
-  const options = { style: "currency", currency: "USD" };
-  const numberFormat = new Intl.NumberFormat("en-US", options);
   const [stockdata, setstockdata] = useState([]);
-  const [lowdate, setlowdate] = useState("");
-  const [highdate, sethighdate] = useState("");
-  const [tickersinput, settickersinput] = useState("");
-  const [pagearr, setpagearr] = useState([]);
+  const [ldate, setldate] = useState("");
+  const [hdate, sethdate] = useState("");
+  const [pagesarr, setpagesarr] = useState([]);
   const [loading, setloading] = useState(false);
+  const [error, seterror] = useState("");
 
-  function getChartData(property) {
-    let chartData = [];
-    for (var i = property.length - 1; i >= 0; i--) {
-      let chartItem = [
-        new Date(property[i].date).getTime(),
-        property[i].adjClose,
-      ];
-      chartData.push(chartItem);
+  function buildInput(params) {
+    const { lowdate, highdate, tickersinput } = params;
+    var dateValidation = checkDates(lowdate, highdate);
+    var tickerValidation = checkTickers(tickersinput);
+    if (dateValidation.isError) {
+      seterror(dateValidation.error);
+      return;
     }
-    return chartData;
-  }
-
-  function buildInput() {
-    if (!lowdate || !highdate || !tickersinput) return;
-    var result = [];
+    if (tickerValidation.isError) {
+      seterror(tickerValidation.error);
+      return;
+    }
+    setldate(lowdate);
+    sethdate(highdate);
     const tickerArr = tickersinput.split(",");
-    var j = 0;
-    var temp = [];
-    for (let i = 0; i < tickerArr.length; i++) {
-      temp.push(tickerArr[i]);
-      if (j === 10) {
-        result.push(temp);
-        j = 0;
-        temp = [];
-      }
-      j++;
-    }
-    setpagearr(result);
+    const result = tickersToPages(tickerArr);
+    setpagesarr(result);
+    seterror("");
+    getStocks(0, result, lowdate, highdate);
   }
 
-  function getStocks(index) {
-    if (pagearr.length === 0 || !pagearr) return;
+  function getStocks(
+    index = 0,
+    pagearr = pagesarr,
+    lowdate = ldate,
+    highdate = hdate
+  ) {
     setloading(true);
     const tickerArr = pagearr[index];
     var inputString = "";
-    var arr = [];
     for (let i = 0; i < tickerArr.length; i++) {
       inputString += tickerArr[i] + ",";
     }
@@ -63,84 +61,35 @@ function App() {
       }),
     };
     fetch("http://localhost:5000/", opts)
-      .then((data) => data.json())
+      .then(requestError)
       .then((res) => {
-        try {
-          for (const property in res) {
-            let chartData = getChartData(res[property]);
-            let obj = {
-              ticker: property,
-              close: res[property][0].adjClose,
-              high: Math.max.apply(
-                Math,
-                res[property].map(function (o) {
-                  return o.high;
-                })
-              ),
-              low: Math.min.apply(
-                Math,
-                res[property].map(function (o) {
-                  return o.low;
-                })
-              ),
-              roi:
-                (res[property][0].adjClose -
-                  res[property][res[property].length - 1].adjClose) /
-                res[property][res[property].length - 1].adjClose,
-              configPrice: setChartData(property, chartData, numberFormat),
-            };
-            arr.push(obj);
-          }
-        } catch (error) {
-          // swallow error
-          console.log(error + "\nYour input:\n" + inputString);
-        }
-        // console.log(arr);
+        const { failed, arr } = processStockData(res);
         setTimeout(() => {
           setstockdata(arr.sort(compare));
           setloading(false);
+          if (failed.length !== 0)
+            seterror(
+              "Couldn't find data for the following stocks: \n" + failed
+            );
         }, 3000);
+      })
+      .catch((error) => {
+        seterror(error);
       });
   }
 
   return (
     <div className="App">
       <h1>Stock Dashboard</h1>
-      <input type="text" onChange={(e) => setlowdate(e.target.value)} />
-      &nbsp;To&nbsp;
-      <input type="text" onChange={(e) => sethighdate(e.target.value)} />
-      <br />
-      <br />
-      <input type="text" onChange={(e) => settickersinput(e.target.value)} />
-      <button onClick={() => buildInput()}>Submit</button>
-      <br />
+      <TickerInput buildInput={buildInput} />
+      <p className="red">{error}</p>
       <br />
       {loading ? (
         "Loading Results..."
       ) : (
         <div>
-          {pagearr.map((inp, index) => {
-            return (
-              <span className="page-number" onClick={() => getStocks(index)}>
-                {index + 1} &nbsp;
-              </span>
-            );
-          })}
-          <div className="headers">
-            <div>Ticker</div>
-            <div>ROI</div>
-            <div>Close</div>
-            <div>High</div>
-            <div>Low</div>
-          </div>
-          {stockdata.map((stock) => {
-            return (
-              <div>
-                <Stock stock={stock} />
-                <ReactHighcharts config={stock.configPrice}></ReactHighcharts>
-              </div>
-            );
-          })}
+          <PageList pagearr={pagesarr} getStocks={getStocks} />
+          <StockList stockdata={stockdata} />
         </div>
       )}
     </div>

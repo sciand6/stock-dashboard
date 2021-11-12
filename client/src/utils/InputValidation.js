@@ -1,3 +1,16 @@
+function validateInput(inp) {
+  const { lowdate, highdate, tickersinput } = inp;
+  var dateValidation = checkDates(lowdate, highdate);
+  var tickerValidation = checkTickers(tickersinput);
+  if (dateValidation.isError) {
+    return dateValidation;
+  }
+  if (tickerValidation.isError) {
+    return tickerValidation;
+  }
+  return { isError: false, error: "" };
+}
+
 function checkDates(lowdate, highdate) {
   if (!lowdate) {
     return { isError: true, error: "Please enter a valid from date." };
@@ -22,4 +35,4 @@ function checkTickers(tickersinput) {
   return { isError: false, error: "" };
 }
 
-export { checkDates, checkTickers };
+export { checkDates, checkTickers, validateInput };

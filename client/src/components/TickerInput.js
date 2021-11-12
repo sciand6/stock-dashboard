@@ -4,6 +4,7 @@ function TickerInput({ buildInput }) {
   const [lowdate, setlowdate] = useState("");
   const [highdate, sethighdate] = useState("");
   const [tickersinput, settickersinput] = useState("");
+
   return (
     <div>
       <p>Enter Date Range</p>

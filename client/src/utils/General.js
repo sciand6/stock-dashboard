@@ -1,3 +1,5 @@
+import { tickersToPages } from "../utils/StockDataProcessessing";
+
 function requestError(response) {
   if (!response.ok) {
     throw Error(response.statusText);
@@ -11,4 +13,11 @@ function compare(a, b) {
   return 0;
 }
 
-export { requestError, compare };
+function buildInput(tickersInput, pageAmount) {
+  const tickerArr = tickersInput.split(",");
+  const result = tickersToPages(tickerArr, pageAmount);
+
+  return result;
+}
+
+export { requestError, compare, buildInput };

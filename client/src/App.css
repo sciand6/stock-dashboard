@@ -14,6 +14,11 @@
   cursor: pointer;
 }
 
+.page-number-active {
+  color: rgb(78, 78, 255);
+  cursor: pointer;
+}
+
 .btn {
   background-color: #0088f8;
   border: none;

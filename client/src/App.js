@@ -3,39 +3,48 @@ import {
   processStockData,
   tickersToPages,
 } from "./utils/StockDataProcessessing";
-import { checkDates, checkTickers } from "./utils/InputValidation";
-import { requestError, compare } from "./utils/General";
+import { validateInput } from "./utils/InputValidation";
+import { requestError, compare, buildInput } from "./utils/General";
 import "./App.css";
 import TickerInput from "./components/TickerInput";
 import PageList from "./components/PageList";
 import StockList from "./components/StockList";
+import PageAmount from "./components/PageAmount";
 
 function App() {
   const [stockdata, setstockdata] = useState([]);
   const [ldate, setldate] = useState("");
   const [hdate, sethdate] = useState("");
+  const [currenttickers, setcurrenttickers] = useState([]);
   const [pagesarr, setpagesarr] = useState([]);
+  const [activeindex, setactiveindex] = useState(false);
   const [loading, setloading] = useState(false);
   const [error, seterror] = useState("");
+  const [pageamount, setpageamount] = useState(10);
 
-  function buildInput(params) {
-    const { lowdate, highdate, tickersinput } = params;
-    var dateValidation = checkDates(lowdate, highdate);
-    var tickerValidation = checkTickers(tickersinput);
-    if (dateValidation.isError) {
-      seterror(dateValidation.error);
+  function updatePageAmount(amount) {
+    if (!currenttickers || currenttickers.length === 0) return;
+    setpageamount(amount);
+    const result = tickersToPages(currenttickers, amount);
+    setpagesarr(result);
+    setactiveindex(0);
+    getStocks(0, result, ldate, hdate);
+  }
+
+  function submitTickers(tickerParams) {
+    if (validateInput(tickerParams).isError) {
+      seterror(validateInput(tickerParams).error);
       return;
     }
-    if (tickerValidation.isError) {
-      seterror(tickerValidation.error);
-      return;
-    }
+    const { lowdate, highdate, tickersinput } = tickerParams;
     setldate(lowdate);
     sethdate(highdate);
     const tickerArr = tickersinput.split(",");
-    const result = tickersToPages(tickerArr);
+    setcurrenttickers(tickerArr);
+    const result = buildInput(tickersinput, pageamount);
     setpagesarr(result);
     seterror("");
+    setactiveindex(0);
     getStocks(0, result, lowdate, highdate);
   }
 
@@ -45,6 +54,7 @@ function App() {
     lowdate = ldate,
     highdate = hdate
   ) {
+    setactiveindex(index);
     setloading(true);
     const tickerArr = pagearr[index];
     var inputString = "";
@@ -81,14 +91,19 @@ function App() {
   return (
     <div className="App">
       <h1>Stock Dashboard</h1>
-      <TickerInput buildInput={buildInput} />
+      <TickerInput buildInput={submitTickers} />
       <p className="red">{error}</p>
       <br />
+      <PageAmount updatePageAmount={updatePageAmount} />
       {loading ? (
         "Loading Results..."
       ) : (
         <div>
-          <PageList pagearr={pagesarr} getStocks={getStocks} />
+          <PageList
+            pagearr={pagesarr}
+            getStocks={getStocks}
+            activeIndex={activeindex}
+          />
           <StockList stockdata={stockdata} />
         </div>
       )}

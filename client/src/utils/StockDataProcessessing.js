@@ -107,14 +107,14 @@ function getChartData(property) {
   return chartData;
 }
 
-function tickersToPages(tickersArr) {
+function tickersToPages(tickersArr, amountOfPages) {
   var j = 0;
   var temp = [];
   var result = [];
 
   for (let i = 0; i < tickersArr.length; i++) {
     temp.push(tickersArr[i]);
-    if (j === 10) {
+    if (j === amountOfPages) {
       result.push(temp);
       j = 0;
       temp = [];

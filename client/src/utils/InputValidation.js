@@ -24,6 +24,12 @@ function checkDates(lowdate, highdate) {
   if (isNaN(Date.parse(highdate))) {
     return { isError: true, error: "Please enter a valid to date." };
   }
+  if (Date.parse(highdate) < Date.parse(lowdate)) {
+    return {
+      isError: true,
+      error: "Your to date is greater than your from date.",
+    };
+  }
 
   return { isError: false, error: "" };
 }

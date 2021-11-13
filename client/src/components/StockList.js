@@ -1,8 +1,11 @@
 import React from "react";
 import Stock from "./Stock";
 import ReactHighcharts from "react-highcharts/ReactHighstock.src";
+import { useSelector } from "react-redux";
 
-function StockList({ stockdata }) {
+function StockList() {
+  const stockdata = useSelector((state) => state.stock.stockdata);
+
   return (
     <div>
       <div className="headers">

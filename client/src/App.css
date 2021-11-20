@@ -9,6 +9,21 @@
   font-size: x-large;
 }
 
+.help-icon {
+  position: absolute;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  top: 20px;
+  right: 50px;
+  font-size: larger;
+  border: 2px solid black;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  cursor: pointer;
+}
+
 .page-number:hover {
   color: rgb(78, 78, 255);
   cursor: pointer;

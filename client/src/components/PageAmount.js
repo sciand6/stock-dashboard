@@ -60,7 +60,7 @@ function PageAmount() {
 
   return (
     <div>
-      <div>How many stocks to show per page? </div>
+      Results Per Page
       <p>
         <span
           className={

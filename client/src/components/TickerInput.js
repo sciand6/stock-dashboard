@@ -55,6 +55,9 @@ function TickerInput() {
       );
       return;
     }
+    let { lowdate, highdate, tickersinput } = tickerParams;
+    lowdate = new Date(lowdate).toISOString().split("T")[0];
+    highdate = new Date(highdate).toISOString().split("T")[0];
     const result = buildInput(tickersinput, pageamount);
     updateState(tickerParams, result);
     dispatch(setLoading({ loading: true }));
@@ -93,7 +96,7 @@ function TickerInput() {
         type="text"
         onChange={(e) => sethighdate(e.target.value)}
       />
-      <p>Enter Tickers</p>
+      <p>Enter Tickers Separated by Commas</p>
       <input
         className="ticker-input"
         type="text"

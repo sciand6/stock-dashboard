@@ -1,30 +1,19 @@
 import "./App.css";
+import { Link } from "react-router-dom";
 import React from "react";
-import TickerInput from "./components/TickerInput";
-import { useSelector } from "react-redux";
-import PageList from "./components/PageList";
-import StockList from "./components/StockList";
-import PageAmount from "./components/PageAmount";
-
+import Main from "./components/Main";
+import { Routes, Route } from "react-router-dom";
 function App() {
-  const loading = useSelector((state) => state.stock.loading);
-  const error = useSelector((state) => state.stock.error);
-
   return (
     <div className="App">
-      <h1>Stock Dashboard</h1>
-      <TickerInput />
-      <p className="red">{error}</p>
-      <br />
-      <PageAmount />
-      {loading ? (
-        "Loading Results..."
-      ) : (
-        <div>
-          <PageList />
-          <StockList />
-        </div>
-      )}
+      <h1>Stock Charts</h1>
+      <Link to="/about">
+        <div className="help-icon">?</div>
+      </Link>
+      <Routes>
+        <Route path="/" element={<Main />}></Route>
+        <Route path="/about" element={<h1>About</h1>}></Route>
+      </Routes>
     </div>
   );
 }

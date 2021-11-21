@@ -3,6 +3,8 @@ import { Link } from "react-router-dom";
 import React from "react";
 import Main from "./components/Main";
 import { Routes, Route } from "react-router-dom";
+import About from "./components/About";
+
 function App() {
   return (
     <div className="App">
@@ -12,7 +14,7 @@ function App() {
       </Link>
       <Routes>
         <Route path="/" element={<Main />}></Route>
-        <Route path="/about" element={<h1>About</h1>}></Route>
+        <Route path="/about" element={<About />}></Route>
       </Routes>
     </div>
   );

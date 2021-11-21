@@ -6,7 +6,7 @@ const yahooFinance = require("yahoo-finance");
 app.use(express.json());
 app.use(cors());
 
-app.post("/", (req, res) => {
+app.post("/apiv1/getStockData", (req, res) => {
   var { tickers, lowdate, highdate } = req.body;
   tickers = tickers.split(",");
   yahooFinance

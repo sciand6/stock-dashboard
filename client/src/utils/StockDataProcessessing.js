@@ -36,7 +36,7 @@ function setChartData(ticker, chartData, numberFormat) {
       },
     },
     title: {
-      text: `${ticker} stock price`,
+      text: `${ticker}`,
     },
     chart: {
       height: 500,

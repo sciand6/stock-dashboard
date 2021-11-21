@@ -15,12 +15,14 @@ function Main() {
       <TickerInput />
       <p className="red">{error}</p>
       <br />
-      <PageAmount />
       {lowdate && highdate ? (
-        <p>
-          Currently showing data from <strong>{lowdate}</strong> through{" "}
-          <strong>{highdate}</strong>
-        </p>
+        <div>
+          <PageAmount />
+          <p>
+            Currently showing data from <strong>{lowdate}</strong> through{" "}
+            <strong>{highdate}</strong>
+          </p>
+        </div>
       ) : (
         ""
       )}

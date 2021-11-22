@@ -2,9 +2,11 @@ const express = require("express");
 const cors = require("cors");
 const app = express();
 const yahooFinance = require("yahoo-finance");
+const path = require("path");
 
 app.use(express.json());
 app.use(cors());
+app.use(express.static(path.join(__dirname, "/build")));
 
 app.post("/apiv1/getStockData", (req, res) => {
   var { tickers, lowdate, highdate } = req.body;
@@ -21,4 +23,8 @@ app.post("/apiv1/getStockData", (req, res) => {
     });
 });
 
-app.listen(5000, () => console.log("Server started on port 5000"));
+app.get("*", (req, res) => {
+  res.sendFile(path.join(__dirname, "/index.html"));
+});
+
+app.listen(process.env.PORT || 5000);

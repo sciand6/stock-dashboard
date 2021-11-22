@@ -4,7 +4,7 @@
   "description": "Used to expose data from the yahoo finance API.",
   "main": "index.js",
   "scripts": {
-    "d": "node index.js"
+    "start": "node index.js"
   },
   "keywords": [],
   "author": "Malcolm",

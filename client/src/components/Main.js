@@ -22,17 +22,17 @@ function Main() {
             Currently showing data from <strong>{lowdate}</strong> through{" "}
             <strong>{highdate}</strong>
           </p>
+          {loading ? (
+            "Loading Results..."
+          ) : (
+            <div>
+              <PageList />
+              <StockList />
+            </div>
+          )}
         </div>
       ) : (
         ""
-      )}
-      {loading ? (
-        "Loading Results..."
-      ) : (
-        <div>
-          <PageList />
-          <StockList />
-        </div>
       )}
     </div>
   );

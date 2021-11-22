@@ -13,7 +13,7 @@ function getStocks(index, pagearr, lowdate, highdate) {
       highdate: highdate,
     }),
   };
-  return fetch("http://localhost:5000/apiv1/getStockData/", opts);
+  return fetch("/apiv1/getStockData/", opts);
 }
 
 export { getStocks };

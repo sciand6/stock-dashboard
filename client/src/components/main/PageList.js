@@ -51,6 +51,7 @@ function PageList() {
       {pagesarr.map((inp, index) => {
         return (
           <span
+            key={inp}
             className={
               index === activeindex ? "page-number-active" : "page-number"
             }

@@ -88,7 +88,7 @@ function StockList() {
       </div>
       {stockdata.map((stock) => {
         return (
-          <div>
+          <div key={stock.ticker}>
             <Stock stock={stock} />
             <ReactHighcharts config={stock.configPrice}></ReactHighcharts>
           </div>

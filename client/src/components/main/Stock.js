@@ -4,7 +4,15 @@ import "../../css/Stocks.css";
 function Stock({ stock }) {
   return (
     <div className="row">
-      <div className="ticker">{stock.ticker}</div>
+      <div className="ticker">
+        <a
+          rel="noreferrer"
+          target="_blank"
+          href={`https://stocktwits.com/symbol/${stock.ticker}`}
+        >
+          {stock.ticker}
+        </a>
+      </div>
       <div className={stock.roi > 0 ? "green" : "red"}>
         {stock.roi.toFixed(3)}
       </div>

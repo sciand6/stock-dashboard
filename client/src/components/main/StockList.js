@@ -1,9 +1,10 @@
 import React, { useState } from "react";
+import { useSelector, useDispatch } from "react-redux";
+import { compare } from "../../utils/General";
+import { setStocks } from "../../slices/stockSlice";
 import Stock from "./Stock";
 import ReactHighcharts from "react-highcharts/ReactHighstock.src";
-import { compare } from "../utils/General";
-import { useSelector, useDispatch } from "react-redux";
-import { setStocks } from "../slices/stockSlice";
+import "../../css/StockList.css";
 
 function StockList() {
   const stockdata = useSelector((state) => state.stock.stockdata);

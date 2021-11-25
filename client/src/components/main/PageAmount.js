@@ -1,26 +1,26 @@
-import React, { useState } from "react";
+import React from "react";
 import { useSelector, useDispatch } from "react-redux";
+import { requestError, compare } from "../../utils/General";
+import { getStocks } from "../../utils/Requests";
 import {
   processStockData,
   tickersToPages,
-} from "../utils/StockDataProcessessing";
+} from "../../utils/StockDataProcessessing";
 import {
   updatePageAmount,
   updateActiveIndex,
   updatePages,
-} from "../slices/inputSlice";
-import { getStocks } from "../utils/Requests";
-import { setError, setLoading, setStocks } from "../slices/stockSlice";
-import { requestError, compare } from "../utils/General";
+} from "../../slices/inputSlice";
+import { setError, setLoading, setStocks } from "../../slices/stockSlice";
 
 function PageAmount() {
   const dispatch = useDispatch();
-  const [activepageamount, setactivepageamount] = useState(10);
+  const activepageamount = useSelector((state) => state.input.pageamount);
   const currenttickers = useSelector((state) => state.input.currenttickers);
   const lowdate = useSelector((state) => state.input.lowdate);
   const highdate = useSelector((state) => state.input.highdate);
 
-  function updateState(pageamount, pagesarr) {
+  function updateInputState(pageamount, pagesarr) {
     dispatch(updatePageAmount({ pageamount }));
     dispatch(updatePages({ pagesarr }));
     dispatch(updateActiveIndex({ activeindex: 0 }));
@@ -28,7 +28,7 @@ function PageAmount() {
 
   function updateStockState(res) {
     const { failed, arr } = processStockData(res);
-    dispatch(setStocks({ stockdata: arr.sort(compare) }));
+    dispatch(setStocks({ stockdata: arr.sort(compare("roi", "desc")) }));
     dispatch(setLoading({ loading: false }));
     if (failed.length !== 0) {
       dispatch(
@@ -42,11 +42,11 @@ function PageAmount() {
   function setPageAmount(amount) {
     if (!currenttickers || currenttickers.length === 0) return;
     const result = tickersToPages(currenttickers, amount);
-    updateState(amount, result);
     dispatch(setLoading({ loading: true }));
     getStocks(0, result, lowdate, highdate)
       .then(requestError)
       .then((res) => {
+        updateInputState(amount, result);
         updateStockState(res);
       })
       .catch((error) => {
@@ -68,7 +68,6 @@ function PageAmount() {
           }
           onClick={() => {
             setPageAmount(10);
-            setactivepageamount(10);
           }}
         >
           10
@@ -79,7 +78,6 @@ function PageAmount() {
             activepageamount === 15 ? "page-number-active" : "page-number"
           }
           onClick={() => {
-            setactivepageamount(15);
             setPageAmount(15);
           }}
         >
@@ -91,7 +89,6 @@ function PageAmount() {
             activepageamount === 20 ? "page-number-active" : "page-number"
           }
           onClick={() => {
-            setactivepageamount(20);
             setPageAmount(20);
           }}
         >

@@ -1,10 +1,11 @@
 import React from "react";
 import { useSelector, useDispatch } from "react-redux";
-import { getStocks } from "../utils/Requests";
-import { requestError, compare } from "../utils/General";
-import { processStockData } from "../utils/StockDataProcessessing";
-import { setStocks, setLoading, setError } from "../slices/stockSlice";
-import { updateActiveIndex } from "../slices/inputSlice";
+import { getStocks } from "../../utils/Requests";
+import { requestError, compare } from "../../utils/General";
+import { processStockData } from "../../utils/StockDataProcessessing";
+import { setStocks, setLoading, setError } from "../../slices/stockSlice";
+import { updateActiveIndex } from "../../slices/inputSlice";
+import "../../css/PageList.css";
 
 function PageList() {
   const dispatch = useDispatch();
@@ -15,7 +16,7 @@ function PageList() {
 
   function updateStockState(res) {
     const { failed, arr } = processStockData(res);
-    dispatch(setStocks({ stockdata: arr.sort(compare) }));
+    dispatch(setStocks({ stockdata: arr.sort(compare("roi", "desc")) }));
     dispatch(setLoading({ loading: false }));
     if (failed.length !== 0) {
       dispatch(

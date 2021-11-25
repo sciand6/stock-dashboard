@@ -1,9 +1,9 @@
 import React from "react";
-import TickerInput from "./TickerInput";
-import PageList from "./PageList";
-import StockList from "./StockList";
-import PageAmount from "./PageAmount";
 import { useSelector } from "react-redux";
+import TickerInput from "../main/TickerInput";
+import PageList from "../main/PageList";
+import StockList from "../main/StockList";
+import PageAmount from "../main/PageAmount";
 
 function Main() {
   const loading = useSelector((state) => state.stock.loading);
@@ -17,15 +17,15 @@ function Main() {
       <br />
       {lowdate && highdate ? (
         <div>
-          <PageAmount />
-          <p>
-            Currently showing data from <strong>{lowdate}</strong> through{" "}
-            <strong>{highdate}</strong>
-          </p>
           {loading ? (
             "Loading Results..."
           ) : (
             <div>
+              <PageAmount />
+              <p>
+                Currently showing data from <strong>{lowdate}</strong> through{" "}
+                <strong>{highdate}</strong>
+              </p>
               <PageList />
               <StockList />
             </div>

@@ -1,13 +1,14 @@
 import React from "react";
-import sampleinput from "../images/sampleinput.png";
-import sampleoutput from "../images/sampleoutput.png";
+import sampleinput from "../../images/sampleinput.png";
+import sampleoutput from "../../images/sampleoutput.png";
 
 function About() {
   return (
     <div>
       <p>
-        Get charts for a list of stocks on a single page ranked by return on
-        investment between the date range of your choice.
+        Get charts and crucial data for a list of stocks on a single page
+        between the date range of your choice. Sort by return on investment,
+        high, low...etc.
       </p>
       <h2>Sample Input</h2>
       <img alt="Sample Input" src={sampleinput} />

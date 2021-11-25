@@ -1,0 +1,9 @@
+.page-number:hover {
+  color: rgb(78, 78, 255);
+  cursor: pointer;
+}
+
+.page-number-active {
+  color: rgb(78, 78, 255);
+  cursor: pointer;
+}

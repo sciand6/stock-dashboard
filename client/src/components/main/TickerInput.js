@@ -1,16 +1,17 @@
 import React, { useState } from "react";
+import { useSelector, useDispatch } from "react-redux";
+import { validateInput } from "../../utils/InputValidation";
+import { getStocks } from "../../utils/Requests";
+import { buildInput } from "../../utils/General";
+import { requestError, compare } from "../../utils/General";
+import { processStockData } from "../../utils/StockDataProcessessing";
 import {
   saveInput,
   updateActiveIndex,
   updatePages,
-} from "../slices/inputSlice";
-import { useSelector, useDispatch } from "react-redux";
-import { validateInput } from "../utils/InputValidation";
-import { getStocks } from "../utils/Requests";
-import { buildInput } from "../utils/General";
-import { requestError, compare } from "../utils/General";
-import { processStockData } from "../utils/StockDataProcessessing";
-import { setStocks, setLoading, setError } from "../slices/stockSlice";
+} from "../../slices/inputSlice";
+import { setStocks, setLoading, setError } from "../../slices/stockSlice";
+import "../../css/TickerInput.css";
 
 function TickerInput() {
   const dispatch = useDispatch();
@@ -35,7 +36,7 @@ function TickerInput() {
 
   function updateStockState(res) {
     const { failed, arr } = processStockData(res);
-    dispatch(setStocks({ stockdata: arr.sort(compare) }));
+    dispatch(setStocks({ stockdata: arr.sort(compare("roi", "desc")) }));
     dispatch(setLoading({ loading: false }));
     if (failed.length !== 0) {
       dispatch(
